@@ -45,9 +45,6 @@ function drawPaddle() {
   ctx.closePath();
 }
 
-
-
-
 function keyDownHandler(r) {
   if (r.key == "Right" || r.key == "ArrowRight") {
     rightPressed = true;
@@ -65,11 +62,11 @@ function keyUpHandler(r) {
 }
 
 function animate() {
-    const id = window.requestAnimationFrame(animate);
-      
-    drawPaddle();
-    
-    if (rightPressed) {
-        paddle
-    }
+  const id = window.requestAnimationFrame(animate);
+
+  drawPaddle();
+
+  if (rightPressed) {
+    paddle
   }
+}
