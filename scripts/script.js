@@ -1,72 +1,137 @@
-//TODO:
-/*
-    -Create events to detect keyboard hits
-        and move the paddle accordingly.
-    - Class Sprite
-    - Class Paddle
-    - Create objects
-    - final objective move the paddle
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 1024;
+canvas.height = 564;
 
-*/
+ctx.fillStyle = "black";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+////////////////////////////////////////////////
+// ctx.fillStyle = "white";
+// ctx.fillRect(canvas.width / 2,canvas.height -60  ,200,25);
 
-const cvs = document.querySelector("canvas");
-const ctx = cvs.getContext("2d");
-cvs.width = 1024;
-cvs.height = 564;
-cvs.style.border = "3px solid black";
+var ballRadius = 10;
+var x = canvas.width / 2;
+var y = canvas.height - 30;
+var dx = 10;
+var dy = -10;
 
-ctx.fillStyle = "white";
-ctx.fillRect(0, 0, cvs.width, cvs.height);
-///////////////////////////////////////////////////
 
-let paddleHeight = 7;
-let paddleWidth = 70;
-let paddleX = (cvs.width - paddleWidth) / 2;
-let rightPressed = false;
-let leftPressed = false;
 
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
+//bricks
+var rowCount= 10;
+var columnCount = 5;
+var bricksW = 75;
+var bricksH = 20;
+var bricksPad = 20;
+var brickOffsetTop = 30;
+var brickOffsetLeft = 30;
+var score = 0;
+var lives = 3;
 
-const paddle = {
-  x: cvs.width / 2 - paddleWidth / 2,
-  y: cvs.height - paddleHeight,
-  width: paddleWidth,
-  height: paddleHeight,
-  dx: 6, // delta x paddel speed
-};
+var bricks = [];
+for (var c = 0; c < columnCount; c++) {
+  bricks[c] = [];
+  for (var r = 0; r < rowCount; r++) {
+    bricks[c][r] = { x: 0, y: 0, status: 1 };
+  }
+}
 
-// DRAW PADDLE
-function drawPaddle() {
+function collision() {
+  for (var c = 0; c < columnCount; c++) {
+    for (var r = 0; r < rowCount; r++) {
+      var b = bricks[c][r];
+      if (b.status == 1) {
+        if (
+          x > b.x &&
+          x < b.x + bricksW &&
+          y > b.y &&
+          y < b.y + bricksH
+        ) {
+          dy = -dy;
+          b.status = 0;
+          score++;
+          if (score == (rowCount* columnCount)+1) {
+            alert("YOU WIN, CONGRATS!");
+            document.location.reload();
+        }
+
+        }
+      }
+    }
+  }
+}
+
+function drawBall() {
   ctx.beginPath();
-  ctx.rect(paddleX, cvs.height - paddleHeight, paddleWidth, paddleHeight);
-  ctx.fillStyle = "#0095DD";
+  // ctx.arc("POS IN X"canvas.width/2, 'POS INcanvas.height - 30'canvas.height-30, ball radius, 0, Math.PI*2);
+  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+  ctx.fillStyle = "#bea925";
   ctx.fill();
   ctx.closePath();
 }
 
-function keyDownHandler(r) {
-  if (r.key == "Right" || r.key == "ArrowRight") {
-    rightPressed = true;
-  } else if (r.key == "Left" || r.key == "ArrowLeft") {
-    leftPressed = true;
+function drawBricks() {
+  for (var c = 0; c < columnCount; c++) {
+    for (var r = 0; r < rowCount; r++) {
+      if (bricks[c][r].status == 1) {
+        var brickX = r * (bricksW + bricksPad) + brickOffsetLeft;
+        var brickY = c * (bricksH + bricksPad) + brickOffsetTop;
+        bricks[c][r].x = brickX;
+        bricks[c][r].y = brickY;
+        ctx.beginPath();
+        ctx.rect(brickX, brickY, bricksW, bricksH);
+        ctx.fillStyle = "#bea925";
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
   }
 }
 
-function keyUpHandler(r) {
-  if (r.key == "Right" || r.key == "ArrowRight") {
-    rightPressed = false;
-  } else if (r.key == "Left" || r.key == "ArrowLeft") {
-    leftPressed = false;
-  }
+function drawScore() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#bea925";
+  ctx.fillText("Score: " + score, 8, 20);
+}
+function drawLives() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#bea925";
+  ctx.fillText("Lives: " + lives, canvas.width - 65, 20);
 }
 
-function animate() {
-  const id = window.requestAnimationFrame(animate);
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBricks();
+  drawBall();
+  drawScore();
+  drawLives();
+  collision();
 
-  drawPaddle();
+  //-ballRadius as when it hits it disapears half of it because we consider the ball from its radius
 
-  if (rightPressed) {
-    paddle
+  // if (y + dy > canvas.height - ballRadius " "
+  // || ""y + dy < ballRadius) {   dy = -dy;}
+
+  // Bouncing off the left and right walls
+  if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+    dx = -dx;
   }
+
+  // Bouncing off the Top and bottom walls
+  if (y + dy < ballRadius) {
+    //3adet l top
+    dy = -dy;
+  } else if (y + dy > canvas.height - ballRadius) {
+    //nzlt t7t l bottom
+
+    dy = -dy;
+  }
+
+  // tomake the ball move changeable x&y every 10 miliseconds
+
+  x += dx;
+  y += dy;
+  requestAnimationFrame(draw);
 }
+
+draw();
