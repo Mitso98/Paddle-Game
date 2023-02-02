@@ -181,3 +181,36 @@ class Paddle extends Sprite {
     }
   }
 }
+
+class Ball extends Sprite {
+  constructor({
+    position,
+    velocity,
+    angel = 0,
+    radius = 10,
+    maxSpeed = GameManager.maxSpeed,
+    hitBy = "none",
+  }) {
+    super({ position, velocity });
+    this.angel = angel;
+    this.radius = radius;
+    this.direction = 1; // will be either 1 or -1, down or up
+    this.maxSpeed = maxSpeed;
+    this.hitBy = hitBy;
+  }
+  reverseBallDirction() {
+    if (this.hitBy === "paddle") this.direction = 1;
+    else this.direction = -1;
+  }
+  draw() {
+    c.fillStyle = "white";
+    c.beginPath();
+    c.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
+    c.fill();
+  }
+  update() {
+    this.draw();
+    this.position.x += this.velocity.x * this.direction;
+    this.position.y += this.velocity.y * this.direction;
+  }
+}
