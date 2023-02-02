@@ -1,4 +1,74 @@
 // Abstract class
+class GameManager {
+  static gameStarted = false;
+  static score = 0;
+  static level;
+  static gameMode;
+  static paddleWidth = 150;
+  static paddleHieght = 20;
+  static brickWidth = 75;
+  static brickHeight = 20;
+  static bricksArr = [];
+  static maxSpeed = 15;
+  static won = false;
+
+  // return: array of Bricks objects
+  static createStar() {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 6; j++) {
+        const random = Math.floor(Math.random() * 3 + 1);
+
+        GameManager.bricksArr.push(
+          new Bricks({
+            position: {
+              x: (GameManager.brickWidth + 50) * (j + 1),
+              y: (GameManager.brickHeight + 50) * (i + 1),
+            },
+            width: GameManager.brickWidth,
+            height: GameManager.brickHeight,
+            hitCount: random,
+          })
+        );
+      }
+    }
+    return GameManager.bricksArr;
+  }
+  static startGame(ball) {
+    if (!GameManager.gameStarted) {
+      GameManager.gameStarted = true;
+      ball.position.y -= -10;
+    }
+  }
+  static endGame(animationID) {
+    GameManager.gameStarted = false;
+
+    window.cancelAnimationFrame(animationID);
+    c.fillStyle = "black";
+    c.fillRect(0, 0, canvas.width, canvas.height);
+
+    // declare the score
+    const getScore = document.getElementById("score");
+    getScore.style.color = "white";
+
+    if (GameManager.won) {
+      getScore.innerHTML = `<h1>Congratualtions your score is ${GameManager.score}</h1><h1>Press r to restart</h1>`;
+    } else {
+      getScore.innerHTML = `<h1>Score is ${GameManager.score}</h1><h1>Press r to restart</h1>`;
+    }
+
+    this.restartGame();
+  }
+  static restartGame() {
+    // restart game
+    window.addEventListener("keydown", (e) => {
+      if (e.key == "r" && !GameManager.gameStarted) {
+        location.reload();
+      }
+    });
+  }
+}
+
+// Abstract class
 class Sprite {
   constructor({
     position = { x: 0, y: 0 },
