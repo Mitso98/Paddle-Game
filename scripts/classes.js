@@ -1,14 +1,18 @@
+// Abstract class
 class Sprite {
-  constructor({ position, velocity, width, height }) {
+  constructor({
+    position = { x: 0, y: 0 },
+    velocity = { x: 0, y: 0 },
+    width = GameManager.paddleWidth,
+    height = GameManager.paddleHieght,
+  }) {
     this.position = position;
     this.velocity = velocity;
     this.width = width;
     this.height = height;
   }
-
   draw() {
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    c.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
   update() {
     this.draw();
@@ -16,6 +20,3 @@ class Sprite {
     this.position.y += this.velocity.y;
   }
 }
-
-
-
