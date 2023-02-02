@@ -214,3 +214,81 @@ class Ball extends Sprite {
     this.position.y += this.velocity.y * this.direction;
   }
 }
+class Bricks extends Sprite {
+  static counter = 0;
+  constructor({ position, width, height, hitCount }) {
+    super({ position, width, height });
+    this.counter = Bricks.counter;
+    this.hitCount = hitCount;
+    switch (this.hitCount) {
+      case 3:
+        this.color = "red";
+        break;
+      case 2:
+        this.color = "yellow";
+        break;
+      case 1:
+        this.color = "green";
+        break;
+
+      default:
+        break;
+    }
+    Bricks.counter++;
+  }
+  isHit(ball) {
+    if (
+      ball.position.x + ball.radius >= this.position.x &&
+      ball.position.x + ball.radius <= this.position.x + this.width &&
+      ball.position.y + ball.radius >= this.position.y &&
+      ball.position.y <= this.position.y + this.height
+    ) {
+      // prevent brick from hitting it self
+      if (this.counter == ball.hitBy) {
+        //ball.velocity.y *= -1;
+        ball.velocity.x *= -1;
+        return false;
+      }
+
+      ball.hitBy = this.counter;
+
+      if (
+        ball.position.x + ball.radius < this.position.x ||
+        ball.position.x + ball.radius > this.position.x + this.width
+      ) {
+        // left & right side
+        ball.velocity.x *= -1;
+      } else {
+        ball.velocity.y *= -1;
+      }
+
+      // switch bricks color
+      if (this.hitCount === 1) {
+        GameManager.score++;
+        return true;
+      } else {
+        this.hitCount--;
+        switch (this.hitCount) {
+          case 2:
+            this.color = "yellow";
+            break;
+          case 1:
+            this.color = "green";
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  draw() {
+    c.beginPath();
+    c.lineWidth = "2";
+    c.strokeStyle = this.color;
+    c.rect(this.position.x, this.position.y, this.width, this.height);
+    c.stroke();
+  }
+}
