@@ -10,10 +10,10 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 // ctx.fillRect(canvas.width / 2,canvas.height -60  ,200,25);
 
 var ballRadius = 10;
-var x = canvas.width / 2;
-var y = canvas.height - 30;
-var dx = 10;
-var dy = -10;
+var xi= canvas.width / 2;
+var yi= canvas.height - 30;
+var dix = 10;
+var diy = -10;
 
 
 
@@ -32,7 +32,7 @@ var bricks = [];
 for (var c = 0; c < columnCount; c++) {
   bricks[c] = [];
   for (var r = 0; r < rowCount; r++) {
-    bricks[c][r] = { x: 0, y: 0, status: 1 };
+    bricks[c][r] = { xi: 0, yi: 0, status: 1 };
   }
 }
 
@@ -42,12 +42,12 @@ function collision() {
       var b = bricks[c][r];
       if (b.status == 1) {
         if (
-          x > b.x &&
-          x < b.x + bricksW &&
-          y > b.y &&
-          y < b.y + bricksH
+         xi> b.xi &&
+         xi< b.xi + bricksW &&
+          yi> b.yi &&
+          yi< b.yi + bricksH
         ) {
-          dy = -dy;
+          diy = -diy;
           b.status = 0;
           score++;
           if (score == (rowCount* columnCount)+1) {
@@ -64,7 +64,7 @@ function collision() {
 function drawBall() {
   ctx.beginPath();
   // ctx.arc("POS IN X"canvas.width/2, 'POS INcanvas.height - 30'canvas.height-30, ball radius, 0, Math.PI*2);
-  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+  ctx.arc(xi, yi, ballRadius, 0, Math.PI * 2);
   ctx.fillStyle = "#bea925";
   ctx.fill();
   ctx.closePath();
@@ -76,8 +76,8 @@ function drawBricks() {
       if (bricks[c][r].status == 1) {
         var brickX = r * (bricksW + bricksPad) + brickOffsetLeft;
         var brickY = c * (bricksH + bricksPad) + brickOffsetTop;
-        bricks[c][r].x = brickX;
-        bricks[c][r].y = brickY;
+        bricks[c][r].xi= brickX;
+        bricks[c][r].yi= brickY;
         ctx.beginPath();
         ctx.rect(brickX, brickY, bricksW, bricksH);
         ctx.fillStyle = "#bea925";
@@ -109,28 +109,28 @@ function draw() {
 
   //-ballRadius as when it hits it disapears half of it because we consider the ball from its radius
 
-  // if (y + dy > canvas.height - ballRadius " "
-  // || ""y + dy < ballRadius) {   dy = -dy;}
+  // if (y + diy > canvas.height - ballRadius " "
+  // || ""y + diy < ballRadius) {   diy = -dy;}
 
   // Bouncing off the left and right walls
-  if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-    dx = -dx;
+  if (xi + dix > canvas.width - ballRadius ||xi+ dix < ballRadius) {
+    dix = -dix;
   }
 
   // Bouncing off the Top and bottom walls
-  if (y + dy < ballRadius) {
+  if (yi + diy < ballRadius) {
     //3adet l top
-    dy = -dy;
-  } else if (y + dy > canvas.height - ballRadius) {
+    diy = -diy;
+  } else if (yi + diy > canvas.height - ballRadius) {
     //nzlt t7t l bottom
 
-    dy = -dy;
+    diy = -diy;
   }
 
   // tomake the ball move changeable x&y every 10 miliseconds
 
-  x += dx;
-  y += dy;
+ xi+= dix;
+  yi+= diy;
   requestAnimationFrame(draw);
 }
 
