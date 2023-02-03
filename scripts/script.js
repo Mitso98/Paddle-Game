@@ -1,137 +1,126 @@
+// Project setup
 const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
+const c = canvas.getContext("2d");
+
+// style canvas
 canvas.width = 1024;
-canvas.height = 564;
+canvas.height = 576;
 
-ctx.fillStyle = "black";
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-////////////////////////////////////////////////
-// ctx.fillStyle = "white";
-// ctx.fillRect(canvas.width / 2,canvas.height -60  ,200,25);
+//////////////////////////////////////////////////////////////////
+// create objects
+const paddle = new Paddle({
+  position: {
+    x: canvas.width / 2 - GameManager.paddleWidth * 0.5,
+    y: canvas.height - 50,
+  },
+});
 
-var ballRadius = 10;
-var xi= canvas.width / 2;
-var yi= canvas.height - 30;
-var dix = 10;
-var diy = -10;
+const ball = new Ball({
+  position: {
+    x: canvas.width / 2,
+    y: canvas.height - 60,
+  },
+  velocity: { x: 0, y: 0 },
+});
 
+// Create arr of bricks objects
+GameManager.createStar();
 
+///////////////////////////////////////////////////////////////
+// controllers
 
-//bricks
-var rowCount= 10;
-var columnCount = 5;
-var bricksW = 75;
-var bricksH = 20;
-var bricksPad = 20;
-var brickOffsetTop = 30;
-var brickOffsetLeft = 30;
-var score = 0;
-var lives = 3;
+const keyPressed = {
+  a: false,
+  w: false,
+  d: false,
+  s: false,
+};
 
-var bricks = [];
-for (var c = 0; c < columnCount; c++) {
-  bricks[c] = [];
-  for (var r = 0; r < rowCount; r++) {
-    bricks[c][r] = { xi: 0, yi: 0, status: 1 };
+let lastKey;
+
+window.addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case "d":
+    case "ArrowRight":
+      lastKey = "d";
+      keyPressed.d = true;
+      break;
+    case "a":
+    case "ArrowLeft":
+      lastKey = "a";
+      keyPressed.a = true;
+      break;
+    case " ":
+      GameManager.startGame(ball);
+      break;
+    default:
+      break;
   }
-}
+});
+window.addEventListener("keyup", (event) => {
+  switch (event.key) {
+    case "d":
+    case "ArrowRight":
+      keyPressed.d = false;
+      break;
+    case "a":
+    case "ArrowLeft":
+      keyPressed.a = false;
+      break;
+    default:
+      break;
+  }
+});
 
-function collision() {
-  for (var c = 0; c < columnCount; c++) {
-    for (var r = 0; r < rowCount; r++) {
-      var b = bricks[c][r];
-      if (b.status == 1) {
-        if (
-         xi> b.xi &&
-         xi< b.xi + bricksW &&
-          yi> b.yi &&
-          yi< b.yi + bricksH
-        ) {
-          diy = -diy;
-          b.status = 0;
-          score++;
-          if (score == (rowCount* columnCount)+1) {
-            alert("YOU WIN, CONGRATS!");
-            document.location.reload();
-        }
+/////////////////////////////////////////////////////////////////////////////
+// Animation
 
-        }
-      }
+function animate() {
+  const animationId = window.requestAnimationFrame(animate);
+
+  // draw canvas
+  c.fillStyle = "black";
+  c.fillRect(0, 0, canvas.width, canvas.height);
+
+  // draw
+  for (let i = 0; i < GameManager.bricksArr.length; i++) {
+    GameManager.bricksArr[i].draw();
+  }
+
+  c.fillStyle = "white";
+  paddle.update();
+  ball.update();
+
+  // detect win
+  if (!GameManager.bricksArr.length) {
+    GameManager.won = true;
+    GameManager.endGame();
+  }
+  // check if brick was hit
+  for (let i = 0; i < GameManager.bricksArr.length; i++) {
+    if (GameManager.bricksArr[i].isHit(ball)) {
+      GameManager.bricksArr.splice(i, 1);
     }
   }
-}
 
-function drawBall() {
-  ctx.beginPath();
-  // ctx.arc("POS IN X"canvas.width/2, 'POS INcanvas.height - 30'canvas.height-30, ball radius, 0, Math.PI*2);
-  ctx.arc(xi, yi, ballRadius, 0, Math.PI * 2);
-  ctx.fillStyle = "#bea925";
-  ctx.fill();
-  ctx.closePath();
-}
+  // add velocity only when conditions are met
+  paddle.velocity.x = 0;
 
-function drawBricks() {
-  for (var c = 0; c < columnCount; c++) {
-    for (var r = 0; r < rowCount; r++) {
-      if (bricks[c][r].status == 1) {
-        var brickX = r * (bricksW + bricksPad) + brickOffsetLeft;
-        var brickY = c * (bricksH + bricksPad) + brickOffsetTop;
-        bricks[c][r].xi= brickX;
-        bricks[c][r].yi= brickY;
-        ctx.beginPath();
-        ctx.rect(brickX, brickY, bricksW, bricksH);
-        ctx.fillStyle = "#bea925";
-        ctx.fill();
-        ctx.closePath();
-      }
-    }
+  if (
+    keyPressed.d &&
+    lastKey === "d" &&
+    paddle.position.x + paddle.width < canvas.width
+  ) {
+    paddle.velocity.x = ball.maxSpeed * 0.7;
+  } else if (keyPressed.a && lastKey === "a" && paddle.position.x > 0) {
+    paddle.velocity.x = ball.maxSpeed * 0.7 * -1;
   }
-}
-
-function drawScore() {
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "#bea925";
-  ctx.fillText("Score: " + score, 8, 20);
-}
-function drawLives() {
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "#bea925";
-  ctx.fillText("Lives: " + lives, canvas.width - 65, 20);
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBricks();
-  drawBall();
-  drawScore();
-  drawLives();
-  collision();
-
-  //-ballRadius as when it hits it disapears half of it because we consider the ball from its radius
-
-  // if (y + diy > canvas.height - ballRadius " "
-  // || ""y + diy < ballRadius) {   diy = -dy;}
-
-  // Bouncing off the left and right walls
-  if (xi + dix > canvas.width - ballRadius ||xi+ dix < ballRadius) {
-    dix = -dix;
+  // move the ball a long with the paddle if game not started
+  if (!GameManager.gameStarted) {
+    ball.velocity.x = paddle.velocity.x;
   }
 
-  // Bouncing off the Top and bottom walls
-  if (yi + diy < ballRadius) {
-    //3adet l top
-    diy = -diy;
-  } else if (yi + diy > canvas.height - ballRadius) {
-    //nzlt t7t l bottom
-
-    diy = -diy;
-  }
-
-  // tomake the ball move changeable x&y every 10 miliseconds
-
- xi+= dix;
-  yi+= diy;
-  requestAnimationFrame(draw);
+  paddle.detectObject(ball, animationId);
 }
 
-draw();
+animate();
