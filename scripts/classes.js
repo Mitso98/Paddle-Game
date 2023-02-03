@@ -2,7 +2,7 @@
 class GameManager {
   static gameStarted = false;
   static score = 0;
-  static level;
+  static level = 1;
   static gameMode;
   static paddleWidth = 150;
   static paddleHieght = 20;
@@ -13,10 +13,13 @@ class GameManager {
   static won = false;
 
   // return: array of Bricks objects
-  static createStar() {
+  static drawBricks() {
+    // make sure level will never go beyond 3
+    if (GameManager.level > 4) GameManager.level = 3;
+
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 6; j++) {
-        const random = Math.floor(Math.random() * 3 + 1);
+        const random = Math.floor(Math.random() * GameManager.level + 1);
 
         GameManager.bricksArr.push(
           new Bricks({
@@ -51,9 +54,12 @@ class GameManager {
     getScore.style.color = "white";
 
     if (GameManager.won) {
-      getScore.innerHTML = `<h1>Congratualtions your score is ${GameManager.score}</h1><h1>Press r to restart</h1>`;
+      getScore.innerHTML = `<h1>You win, your score is ${GameManager.score}</h1><h1>Press r to restart</h1>`;
+      getScore.innerHTML += `<br/>Level ${GameManager.level} out of 3`;
     } else {
-      getScore.innerHTML = `<h1>Score is ${GameManager.score}</h1><h1>Press r to restart</h1>`;
+      getScore.innerHTML = `<h1>Lost try again!<br/>`
+      getScore.innerHTML += `<h1>Score is ${GameManager.score}</h1><h1>Press r to restart</h1>`;
+      getScore.innerHTML += `<br/>Level ${GameManager.level} out of 3`;
     }
 
     this.restartGame();
@@ -188,6 +194,7 @@ class Paddle extends Sprite {
   //TODO:
   determineAngelForBoundries(ball) {
     if (ball.position.x <= 0) {
+      // left side
       switch (ball.hitBy) {
         case "top":
           ball.velocity.x *= -1;
@@ -203,6 +210,7 @@ class Paddle extends Sprite {
       }
       ball.hitBy = "left";
     } else if (ball.position.x >= canvas.width) {
+      // right side
       switch (ball.hitBy) {
         case "top":
           ball.velocity.x *= -1;
@@ -225,6 +233,7 @@ class Paddle extends Sprite {
         // it touches both right and top
         // this condition "top" fix that
         case "top":
+          ball.velocity.y *= -1;
           ball.velocity.x *= -1;
           break;
         case "right":
@@ -284,6 +293,7 @@ class Ball extends Sprite {
     this.position.y += this.velocity.y * this.direction;
   }
 }
+
 class Bricks extends Sprite {
   static counter = 0;
   constructor({ position, width, height, hitCount }) {
@@ -309,9 +319,9 @@ class Bricks extends Sprite {
   isHit(ball) {
     if (
       ball.position.x + ball.radius >= this.position.x &&
-      ball.position.x + ball.radius <= this.position.x + this.width &&
+      ball.position.x - ball.radius <= this.position.x + this.width &&
       ball.position.y + ball.radius >= this.position.y &&
-      ball.position.y <= this.position.y + this.height
+      ball.position.y - ball.radius <= this.position.y + this.height
     ) {
       // prevent brick from hitting it self
       if (this.counter == ball.hitBy) {
@@ -323,8 +333,11 @@ class Bricks extends Sprite {
       ball.hitBy = this.counter;
 
       if (
-        ball.position.x + ball.radius < this.position.x ||
-        ball.position.x + ball.radius > this.position.x + this.width
+        (ball.position.x + ball.radius <= this.position.x &&
+          ball.position.x + ball.radius >= this.position.x + this.height) ||
+        (ball.position.x + ball.radius <= this.position.x + this.width &&
+          ball.position.x + ball.radius >=
+            this.position.x + this.width + this.height)
       ) {
         // left & right side
         ball.velocity.x *= -1;

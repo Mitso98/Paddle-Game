@@ -24,7 +24,7 @@ const ball = new Ball({
 });
 
 // Create arr of bricks objects
-GameManager.createStar();
+GameManager.drawBricks();
 
 ///////////////////////////////////////////////////////////////
 // controllers
@@ -91,11 +91,6 @@ function animate() {
   paddle.update();
   ball.update();
 
-  // detect win
-  if (!GameManager.bricksArr.length) {
-    GameManager.won = true;
-    GameManager.endGame();
-  }
   // check if brick was hit
   for (let i = 0; i < GameManager.bricksArr.length; i++) {
     if (GameManager.bricksArr[i].isHit(ball)) {
@@ -117,10 +112,29 @@ function animate() {
   }
   // move the ball a long with the paddle if game not started
   if (!GameManager.gameStarted) {
-    ball.velocity.x = paddle.velocity.x;
+    if (GameManager.level == 1) {
+      ball.velocity.x = paddle.velocity.x;
+    } else {
+      ball.velocity.x = paddle.velocity.x * -1;
+      ball.velocity.y = 0;
+    }
   }
 
   paddle.detectObject(ball, animationId);
+
+  // detect win
+  if (!GameManager.bricksArr.length) {
+    if (GameManager.level === 3) {
+      GameManager.won = true;
+      GameManager.endGame();
+    } else {
+      ball.position.x = paddle.position.x + paddle.width * 0.5;
+      ball.position.y = paddle.position.y + 60;
+      GameManager.gameStarted = false;
+      GameManager.level++;
+      GameManager.drawBricks();
+    }
+  }
 }
 
 animate();
