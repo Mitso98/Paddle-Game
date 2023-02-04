@@ -22,7 +22,7 @@ const paddle = new Paddle({
 
 const ball = new Ball({
   position: {
-    x: canvas.width / 2 - 25,
+    x: canvas.width / 2,
     y: canvas.height - 60,
   },
   velocity: { x: 0, y: 0 },
@@ -141,7 +141,7 @@ function animate() {
     } else {
       // next level
       ball.position.x = paddle.position.x + paddle.width * 0.5;
-      ball.position.y = paddle.position.y - 10;
+      ball.position.y = paddle.position.y;
       ball.maxSpeed += 2;
       GameManager.gameStarted = false;
       GameManager.level++;
