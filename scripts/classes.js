@@ -18,14 +18,14 @@ class GameManager {
     // make sure level will never go beyond 3
     if (GameManager.level > 4) GameManager.level = 3;
 
-    for (let i = 0; i < 1; i++) {
-      for (let j = 0; j < 1; j++) {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 6; j++) {
         const random = Math.floor(Math.random() * GameManager.level + 1);
 
         GameManager.bricksArr.push(
           new Bricks({
             position: {
-              x: (GameManager.brickWidth + 700) * (j + 1),
+              x: (GameManager.brickWidth + 50) * (j + 1),
               y: (GameManager.brickHeight + 50) * (i + 1),
             },
             width: GameManager.brickWidth,
