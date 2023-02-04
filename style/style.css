@@ -7,7 +7,14 @@ body {
   width: 100vw;
   background-color: rgba(0, 0, 0, 0.7);
 }
-
+.live-stats{
+  display:flex;
+  justify-content: center;
+  align-content: center;
+}
+.live-stats h1{
+  margin-right: 60px;
+}
 .wrapper {
   position: relative;
   display: flex;
@@ -18,4 +25,6 @@ body {
 #gameStats {
   position: absolute;
   display: flex;
+  top: 30vh;
+  left: 40vw;
 }

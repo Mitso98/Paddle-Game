@@ -1,3 +1,8 @@
+// get live stats
+const level = document.getElementById("level");
+const live = document.getElementById("lives");
+const score = document.getElementById("score");
+
 // Project setup
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
@@ -82,6 +87,11 @@ function animate() {
   c.fillStyle = "black";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
+  // update stats
+  level.innerHTML = `<h3>Level: ${GameManager.level}</h3>`;
+  live.innerHTML = `<h3>live: ${GameManager.live}</h3>`;
+  score.innerHTML = `<h3>score: ${GameManager.score}</h3>`;
+
   // draw
   for (let i = 0; i < GameManager.bricksArr.length; i++) {
     GameManager.bricksArr[i].draw();
@@ -110,9 +120,12 @@ function animate() {
   } else if (keyPressed.a && lastKey === "a" && paddle.position.x > 0) {
     paddle.velocity.x = ball.maxSpeed * 0.7 * -1;
   }
+
+  paddle.detectObject(ball, animationId);
+
   // move the ball a long with the paddle if game not started
   if (!GameManager.gameStarted) {
-    if (GameManager.level == 1) {
+    if (GameManager.level == 1 && GameManager.live == 3) {
       ball.velocity.x = paddle.velocity.x;
     } else {
       ball.velocity.x = paddle.velocity.x * -1;
@@ -120,16 +133,16 @@ function animate() {
     }
   }
 
-  paddle.detectObject(ball, animationId);
-
   // detect win
   if (!GameManager.bricksArr.length) {
     if (GameManager.level === 3) {
       GameManager.won = true;
       GameManager.endGame();
     } else {
+      // next level
       ball.position.x = paddle.position.x + paddle.width * 0.5;
-      ball.position.y = paddle.position.y + 60;
+      ball.position.y = paddle.position.y - 10;
+      ball.maxSpeed += 2;
       GameManager.gameStarted = false;
       GameManager.level++;
       GameManager.drawBricks();

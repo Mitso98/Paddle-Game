@@ -4,12 +4,13 @@ class GameManager {
   static score = 0;
   static level = 1;
   static gameMode;
+  static live = 3;
   static paddleWidth = 150;
   static paddleHieght = 20;
   static brickWidth = 75;
   static brickHeight = 20;
   static bricksArr = [];
-  static maxSpeed = 15;
+  static maxSpeed = 10;
   static won = false;
 
   // return: array of Bricks objects
@@ -50,14 +51,14 @@ class GameManager {
     c.fillRect(0, 0, canvas.width, canvas.height);
 
     // declare the score
-    const getScore = document.getElementById("score");
+    const getScore = document.getElementById("final-score");
     getScore.style.color = "white";
 
     if (GameManager.won) {
       getScore.innerHTML = `<h1>You win, your score is ${GameManager.score}</h1><h1>Press r to restart</h1>`;
       getScore.innerHTML += `<br/>Level ${GameManager.level} out of 3`;
     } else {
-      getScore.innerHTML = `<h1>Lost try again!<br/>`
+      getScore.innerHTML = `<h1>Lost try again!<br/>`;
       getScore.innerHTML += `<h1>Score is ${GameManager.score}</h1><h1>Press r to restart</h1>`;
       getScore.innerHTML += `<br/>Level ${GameManager.level} out of 3`;
     }
@@ -121,9 +122,16 @@ class Paddle extends Sprite {
       // as I need to customise this
       this.determineAngelForBoundries(ball);
     } else if (ball.position.y > this.position.y) {
-      //TODO: implement game over function
-      GameManager.endGame(animationID);
-      return true;
+      if (GameManager.live > 1) {
+        GameManager.live--;
+        ball.position.x = paddle.position.x + paddle.width * 0.5;
+        ball.position.y = paddle.position.y - 10;
+        GameManager.gameStarted = false;
+        return false;
+      } else {
+        GameManager.endGame(animationID);
+        return true;
+      }
     }
   }
   // will be called by detectObject
