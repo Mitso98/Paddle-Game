@@ -22,7 +22,7 @@ const paddle = new Paddle({
 
 const ball = new Ball({
   position: {
-    x: canvas.width / 2,
+    x: canvas.width / 2 - 25,
     y: canvas.height - 60,
   },
   velocity: { x: 0, y: 0 },
